@@ -29,9 +29,9 @@ library(psych)
 source("IndivRidgeGloWassReg.R")
 source("lambdaGlobalcoordesc.R")
 source("GloWassReg.R")
-file_folder1 <- "/gpfs/home/ly21a/projects/frechet_regression/shared_code_SPD_Matrices/"
-file_folder2 <- "/gpfs/home/ly21a/projects/frechet_regression/ADNI/"
-source(paste0(file_folder1, "ultility.R"))
+file_folder1 <- ""
+file_folder2 <- ""
+source(paste0(file_folder1, "utility.R"))
 Rcpp::sourceCpp(paste0(file_folder2, "dcov_rcpp.cpp"))
 ####################################################################
 
