@@ -26,7 +26,7 @@
 ###################################################
 library(psych)
 library(ramify)
-file_folder1 <- "/gpfs/home/ly21a/projects/frechet_regression/shared_code_SPD_Matrices/"
+file_folder1 <- ""
 source("IndivRidgeGloCovReg.R") 
 source("IndivRidgeGFRCovCholesky.R")
 source("lambdaGlobalcoordesc.R")
@@ -35,8 +35,8 @@ source("GloCovReg.R")
 source(paste0(file_folder1, "IndivRidgeGFRCovCholesky_v2.R"))
 Rcpp::sourceCpp(paste0(file_folder1, "IndivRidgeGFRCovCholesky_vC.cpp"))
 source("cholesky_error.R")
-source(paste0(file_folder1, "ultility.R"))
-file_folder2 <- "/gpfs/home/ly21a/projects/frechet_regression/ADNI/"
+source(paste0(file_folder1, "utility.R"))
+file_folder2 <- ""
 Rcpp::sourceCpp(paste0(file_folder2, "dcov_rcpp.cpp"))
 
 ####################################################
