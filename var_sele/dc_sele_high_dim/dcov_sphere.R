@@ -1,4 +1,4 @@
-file_folder1 <- "/gpfs/home/ly21a/projects/frechet_regression/shared_code_SPD_Matrices/"
+file_folder1 <- ""
 source(paste0(file_folder1, "IndivRidgeGloCovReg.R"))
 source(paste0(file_folder1, "IndivRidgeGFRCovCholesky.R"))
 source(paste0(file_folder1, "lambdaGlobalcoordesc.R"))
