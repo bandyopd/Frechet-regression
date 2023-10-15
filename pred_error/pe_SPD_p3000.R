@@ -1,4 +1,4 @@
-file_folder1 <- "/gpfs/home/ly21a/projects/frechet_regression/shared_code_SPD_Matrices/"
+file_folder1 <- ""
 source(paste0(file_folder1, "IndivRidgeGloCovReg.R"))
 source(paste0(file_folder1, "IndivRidgeGFRCovCholesky.R"))
 source(paste0(file_folder1, "lambdaGlobalcoordesc.R"))
@@ -6,9 +6,9 @@ source(paste0(file_folder1, "GFRCovCholesky.R"))
 source(paste0(file_folder1, "GloCovReg.R"))
 source(paste0(file_folder1, "cholesky_error.R"))
 source(paste0(file_folder1, "IndivRidgeGFRCovCholesky_v2.R"))
-source(paste0(file_folder1, "ultility.R"))
+source(paste0(file_folder1, "utility.R"))
 source(paste0(file_folder1, "ultility_smooth.R"))
-file_folder2 <- "/gpfs/home/ly21a/projects/frechet_regression/ADNI/"
+file_folder2 <- ""
 # Rcpp::sourceCpp("IndivRidgeGFRCovCholesky_vC.cpp")
 Rcpp::sourceCpp(paste0(file_folder2, "dcov_rcpp.cpp"))
 Rcpp::sourceCpp(paste0(file_folder2, "IndivRidgeGFRCovCholesky_vC.cpp"))
