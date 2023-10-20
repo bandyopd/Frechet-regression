@@ -6,8 +6,8 @@ source(paste0(file_folder1, "GFRCovCholesky.R"))
 source(paste0(file_folder1, "GloCovReg.R"))
 source(paste0(file_folder1, "cholesky_error.R"))
 source(paste0(file_folder1, "IndivRidgeGFRCovCholesky_v2.R"))
-source(paste0(file_folder1, "ultility.R"))
-file_folder2 <- "/gpfs/home/ly21a/projects/frechet_regression/ADNI/"
+source(paste0(file_folder1, "utility.R"))
+file_folder2 <- ""
 # Rcpp::sourceCpp("IndivRidgeGFRCovCholesky_vC.cpp")
 Rcpp::sourceCpp(paste0(file_folder2, "dcov_rcpp.cpp"))
 library(gglasso)
