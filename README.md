@@ -1,3 +1,5 @@
+For a PDF version, please read [Vignette](https://github.com/leiyan-ly/Frechet-regression/blob/main/Vignette.pdf)
+
 ## Introduction
 
 Within the `utility_functions` folder, you will find essential functions
