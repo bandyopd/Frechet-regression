@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Lei Yan" />
+
+<meta name="date" content="2023-10-19" />
+
+<title>R code for Variable Screening and Spatial Smoothing in Fréchet Regression with Application to Diffusion Tensor Imaging</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">R code for Variable Screening and Spatial Smoothing in Fréchet Regression with Application to Diffusion Tensor Imaging</h1>
+<h4 class="author">Lei Yan</h4>
+<h4 class="date">2023-10-19</h4>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Within the <code>utility_functions</code> folder, you will find essential functions for implementing two crucial components of the proposed distance covariance (DC) variable screening method and spatial smoothing in Fréchet regression. These functions are instrumental in the analysis and modeling of complex data.</p>
+<p>Let’s explore the key components and files associated with these methods:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Distance Covariance (DC) Variable Screening</strong></p>
+<ul>
+<li><p>The core of the DC variable screening method can be found in the R file named <code>dcov.R</code>. This file contains the necessary code to compute the distance covariance, a fundamental measure for identifying and selecting important variables within your data.</p></li>
+<li><p>To enhance computational efficiency, a C++ implementation of the core DC computation function is available in the <code>dcov_cpp.cpp</code> file. This C++ implementation is designed to accelerate the DC calculation process, making it faster and more robust.</p></li>
+</ul></li>
+<li><p><strong>Spatial Smoothing in Fréchet Regression</strong></p>
+<ul>
+<li><p>If your data involves spatially correlated variables, the <code>spatial_smooth.R</code> file provides functions to perform spatial smoothing. This smoothing technique is particularly useful when dealing with spatially correlated symmetric positive definite (SPD) matrices.</p></li>
+<li><p>To further optimize the process, you can take advantage of the C++ implementation available in the <code>spatial_smooth_cpp.cpp</code> file. This implementation leverages C++’s performance benefits to efficiently compute weighted Fréchet means for spatial smoothing.</p></li>
+</ul></li>
+</ol>
+<p>In addition to the primary utility functions, you’ll find code in the <code>pred_error</code> and <code>var_sele</code> folders. These folders contain code related to the simulations described in Sections 3.1 and 3.2 of the accompanying paper. These simulations provide practical insights and demonstrate the application of the distance covariance screening method and spatial smoothing in real-world scenarios.</p>
+<p>This Vignette guides you through the usage of these functions, offering practical examples and insights to empower your data analysis and modeling endeavors. Let’s dive into the details and learn how to harness these tools effectively.</p>
+</div>
+<div id="usages" class="section level2">
+<h2>Usages</h2>
+<div id="distance-covariance-variable-screening" class="section level3">
+<h3>Distance Covariance Variable Screening</h3>
+<p>In this section, we will explore how to effectively use the distance covariance screening method. This method plays a pivotal role in the context of Fréchet regression, especially when dealing with responses represented as symmetric positive definite (SPD) matrices. For our illustrative purposes, we’ll focus on the Cholesky distance between two SPD matrices. This particular example aligns with Example 1a in Section 3.2 of the associated paper.</p>
+<p>To get started, we need to ensure that the necessary packages and source files are loaded:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;utility_functions&quot;</span>, <span class="st">&quot;dcov.R&quot;</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;utility_functions&quot;</span>, <span class="st">&quot;utility.R&quot;</span>))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>Rcpp<span class="sc">::</span><span class="fu">sourceCpp</span>(<span class="fu">here</span>(<span class="st">&quot;utility_functions&quot;</span>, <span class="st">&quot;dcov_rcpp.cpp&quot;</span>))</span></code></pre></div>
+<p>The key function we’ll be using is compute_dcov(n, p, type_data, seed, d_y, r = 0.5). Let’s break down its essential arguments:</p>
+<ul>
+<li>n: An integer representing the number of samples.</li>
+<li>p: An integer indicating the number of predictors.</li>
+<li>type_data: A string specifying the type of response data.</li>
+<li>seed: An integer used as a seed for random data generation.</li>
+<li>d_y: A function that defines the distance metric in response space.</li>
+<li>r: A real number ranging from 0 to 1, denoting the correlation between simulated predictors.</li>
+</ul>
+<p>And the return value is a list containing the DC and generated data <span class="math inline">\(X, Y\)</span>.</p>
+<p>Now, let’s put this method into practice and illustrate the importance of selected variables. In this demonstration, the important variables are <span class="math inline">\(X_{1}, X_{5}, X_{9}, X_{13}, X_{17}, X_{20}\)</span> and we let <span class="math inline">\(n = 200, p = 20\)</span>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>seed <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>type_data <span class="ot">&lt;-</span> <span class="st">&quot;SPD&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="dv">6</span> <span class="co"># model size</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>d_y <span class="ot">&lt;-</span> cholesky_error_C <span class="co"># cpp version of Cholesky distance, included in dcov_rcpp.cpp file</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>dcov_result <span class="ot">&lt;-</span> <span class="fu">compute_dcov</span>(n, p, type_data, seed, d_y, <span class="at">r =</span> <span class="fl">0.5</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>dcov_SPD <span class="ot">&lt;-</span> dcov_result<span class="sc">$</span>dcov_SPD</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(dcov_SPD, <span class="at">decreasing =</span> <span class="cn">TRUE</span>, <span class="at">index.return =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>ix[<span class="dv">1</span><span class="sc">:</span>d]</span></code></pre></div>
+<p>Alternatively, you can separate data generation and distance covariance estimation using the <code>compute_dcov2(X, Y, type_data, d_y)</code> function. In this case, you’ll first generate the data using <code>gendata_SPD(n, p, m, r, seed)</code> and then apply <code>compute_dcov2()</code> to the generated data. The arguments of <code>compute_dcov2()</code> are</p>
+<ul>
+<li>X: A n by p matrix containing the predictors</li>
+<li>Y: A matrix or 3D array depending on the data type of response</li>
+<li>d_y: A function, the distance function defined in response space</li>
+</ul>
+<p>The arguments of <code>gendata_SPD()</code> are</p>
+<ul>
+<li>n: An integer, number of samples</li>
+<li>p: An integer, number of predictors</li>
+<li>m: An integer, dimension of SPD matrix outputs</li>
+<li>r: A real number between 0 and 1, correlation between simulated predictors</li>
+<li>seed: An integer, seed set for the random generation</li>
+</ul>
+<p>First, generate data.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>seed <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>dataXY <span class="ot">&lt;-</span> <span class="fu">gendata_SPD</span>(n, p, m, r, seed)</span></code></pre></div>
+<p>Then we apply <code>compute_dcov2()</code> on the data.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>type_data <span class="ot">&lt;-</span> <span class="st">&quot;SPD&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="dv">6</span> <span class="co"># model size</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>d_y <span class="ot">&lt;-</span> cholesky_error_C <span class="co"># cpp version of Cholesky distance, included in dcov_rcpp.cpp file</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>dcov_SPD <span class="ot">&lt;-</span> <span class="fu">compute_dcov2</span>(dataXY<span class="sc">$</span>x, dataXY<span class="sc">$</span>Min, type_data, d_y)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(dcov_SPD, <span class="at">decreasing =</span> <span class="cn">TRUE</span>, <span class="at">index.return =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>ix[<span class="dv">1</span><span class="sc">:</span>d]</span></code></pre></div>
+</div>
+<div id="spatial-smoothing" class="section level3">
+<h3>Spatial Smoothing</h3>
+<p>In this section, we delve into the practical application of spatial smoothing techniques when dealing with responses represented as spatially correlated symmetric positive definite (SPD) matrices. Specifically, we’ll explore how to use spatial smoothing within the context of Fréchet regression, focusing on simulating diffusion tensor imaging datasets using the Wishart process model<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.</p>
+<p>We start by generating diffusion tensors on a <span class="math inline">\(20 \times 20\)</span> grid , with a spacing of 1 between adjacent points. Each grid point represents a voxel, and we can assign coordinates to these voxels. For any given voxel <span class="math inline">\(v\)</span>, we denote its coordinates as <span class="math inline">\(\mathbf{j}(v) = (j_1(v), j_2(v))\)</span>. To define the neighborhood of <span class="math inline">\(v\)</span>, we consider voxels <span class="math inline">\(v&#39;\)</span> for which the Euclidean distance <span class="math inline">\(\|\mathbf{j}(v) - \mathbf{j}(v&#39;)\|_2\)</span> is less than or equal to 1.</p>
+<p>Key Parameters:</p>
+<ul>
+<li>Sample Size (<span class="math inline">\(n\)</span>): We set the sample size to 200.</li>
+<li>Predictors (<span class="math inline">\(X\)</span>): We simulate predictor variables <span class="math inline">\(X\)</span> in <span class="math inline">\(\mathbb{R}^p\)</span> using the method described in the SPD continuous example found in Section 3.2. The correlation parameter (<span class="math inline">\(\rho\)</span>) is set to 0.5.</li>
+</ul>
+<p>For the modeling of the diagonal and off-diagonal elements of <span class="math inline">\(L_i(v)\)</span>, we use variables <span class="math inline">\(X_{1}, X_{5}, X_{10}\)</span> and <span class="math inline">\(X_{15}, X_{20}, X_{25}\)</span>.</p>
+<p>Additional Parameters:</p>
+<ul>
+<li>Degree of Freedom (<span class="math inline">\(m\)</span>): We set the degree of freedom (<span class="math inline">\(m\)</span>) to 3.</li>
+<li>Spatial Correlation (<span class="math inline">\(\phi\)</span>): The spatial correlation parameter (<span class="math inline">\(\phi\)</span>) is set to 15.</li>
+</ul>
+<p>Let’s proceed with the practical application of spatial smoothing techniques and understand how they can enhance your data analysis in the context of Fréchet regression.</p>
+<p>We start from loading the required packages and source files.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(geoR)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mgcv)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;utility_functions&quot;</span>, <span class="st">&quot;spatial_smooth.R&quot;</span>))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;utility_functions&quot;</span>, <span class="st">&quot;utility.R&quot;</span>))</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;utility_functions&quot;</span>, <span class="st">&quot;FRiSO&quot;</span>, <span class="st">&quot;GloCovReg.R&quot;</span>))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">here</span>(<span class="st">&quot;utility_functions&quot;</span>, <span class="st">&quot;FRiSO&quot;</span>, <span class="st">&quot;GFRCovCholesky.R&quot;</span>))</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>Rcpp<span class="sc">::</span><span class="fu">sourceCpp</span>(<span class="fu">here</span>(<span class="st">&quot;utility_functions&quot;</span>, <span class="st">&quot;spatial_smooth_cpp.cpp&quot;</span>))</span></code></pre></div>
+<p>To generate diffusion tensor data, we use function <code>gen_SWP(x, correlation, grid_size, m, seed_)</code>. The arguments are</p>
+<ul>
+<li>x: A n*p design matrix, n is the number of subject, p is the number of variables</li>
+<li>correlation: Correlation parameter that control the strength of spatial correlation</li>
+<li>grid_size: A grid_size*grid_size grid is generated</li>
+<li>m: Degree of freedom of the Wishart distribution of U</li>
+<li>seed_: Seed for reproducing results</li>
+</ul>
+<p>To generate data, we first generate a design matrix using function <code>gendata_SPD()</code> and then call the <code>gen_SWP()</code> function.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">30</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>seed <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>dataXY <span class="ot">&lt;-</span> <span class="fu">gendata_SPD</span>(n, p, m, r, seed)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> dataXY<span class="sc">$</span>x</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>correlation <span class="ot">&lt;-</span> <span class="dv">15</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>grid_size <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fu">gen_SWP</span>(x, correlation, grid_size, m, seed) <span class="co"># dimensions m*m*n*n_voxel</span></span></code></pre></div>
+<p>Then for each voxel, we fit global Fréchet regression using function <code>GloCovReg()</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>n_voxel <span class="ot">&lt;-</span> <span class="fu">dim</span>(Y)[<span class="dv">4</span>]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>Y_hat <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="at">dim =</span> <span class="fu">c</span>(m, m, n, n_voxel))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(n)) {</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  X_i <span class="ot">&lt;-</span> x</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  Y_i <span class="ot">&lt;-</span> Y[,,, i]</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  pred_DC_fr <span class="ot">&lt;-</span> <span class="fu">GloCovReg</span>(<span class="fu">as.matrix</span>(X_i), <span class="at">M =</span> Y_i,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">xout =</span> <span class="fu">as.matrix</span>(X_i),</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">optns =</span> <span class="fu">list</span>(<span class="at">metric=</span><span class="st">&quot;cholesky&quot;</span>))<span class="sc">$</span>Mout</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  Y_hat[,, i, ] <span class="ot">&lt;-</span> <span class="fu">convert_list23D</span>(pred_DC_fr)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Now we are ready to apply spatial smoothing using function <code>compute_smooth_Fr(pred_Fr, weight, seed_)</code>. The arguments are</p>
+<ul>
+<li>pred_Fr: A <span class="math inline">\(m\times m \times n \times \text{n_voxel}\)</span> array, contains predicted SPD</li>
+<li>weight: A real number between 0 and 1, weight of neighborhood voxels</li>
+<li>seed_: Seed for reproducing results</li>
+</ul>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>weight <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>seed_ <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>Y_hat_smooth <span class="ot">&lt;-</span> <span class="fu">compute_smooth_Fr</span>(Y_hat, <span class="at">weight =</span> weight, <span class="at">seed_ =</span> seed_)</span></code></pre></div>
+</div>
+<div id="two-stage-method" class="section level3">
+<h3>Two-Stage Method</h3>
+<p>Combing DC variable screening and spatial smoothing, we have a two-stage method that first select important variables and then smooth the predictions. We continue to use the simulated diffusion tension data <span class="math inline">\(Y\)</span> generated using function <code>gen_SWP()</code>. We set important variables to be <span class="math inline">\(X_{1}\)</span>, <span class="math inline">\(X_{5}\)</span>, <span class="math inline">\(X_{10}\)</span>, <span class="math inline">\(X_{15}\)</span>, <span class="math inline">\(X_{20}\)</span>, <span class="math inline">\(X_{25}\)</span>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">### stage one: select important variables</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>n_voxel <span class="ot">&lt;-</span> <span class="fu">dim</span>(Y)[<span class="dv">4</span>]</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>type_data <span class="ot">&lt;-</span> <span class="st">&quot;SPD&quot;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>Y_hat <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="at">dim =</span> <span class="fu">c</span>(m, m, n, n_voxel))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(n)) {</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  X_i <span class="ot">&lt;-</span> x</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  Y_i <span class="ot">&lt;-</span> Y[,,, i]</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  d <span class="ot">&lt;-</span> <span class="dv">10</span> <span class="co"># keep the first d variables</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  dcov <span class="ot">&lt;-</span> <span class="fu">compute_dcov2</span>(X_i, Y_i, type_data, cholesky_error_C)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  dc_selected <span class="ot">&lt;-</span> <span class="fu">sort</span>(dcov, <span class="at">decreasing =</span> <span class="cn">TRUE</span>, <span class="at">index.return =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>ix[<span class="dv">1</span><span class="sc">:</span>d]</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  dc_selected <span class="ot">&lt;-</span> dc_selected[<span class="fu">order</span>(dc_selected)]</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># fit global Fréchet regression using selected variables</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  pred_DC_fr <span class="ot">&lt;-</span> <span class="fu">GloCovReg</span>(<span class="fu">as.matrix</span>(X_i[, dc_selected]), <span class="at">M =</span> Y_i,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>                          <span class="at">xout =</span> <span class="fu">as.matrix</span>(X_i[, dc_selected]),</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>                          <span class="at">optns =</span> <span class="fu">list</span>(<span class="at">metric=</span><span class="st">&quot;cholesky&quot;</span>))<span class="sc">$</span>Mout</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  Y_hat[,, i, ] <span class="ot">&lt;-</span> <span class="fu">convert_list23D</span>(pred_DC_fr)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="do">### stage two: smoothing the results</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>weight <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>seed_ <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>Y_hat_smooth <span class="ot">&lt;-</span> <span class="fu">compute_smooth_Fr</span>(Y_hat, <span class="at">weight =</span> weight, <span class="at">seed_ =</span> seed_)</span></code></pre></div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://onlinelibrary.wiley.com/doi/abs/10.1111/biom.13445">Learn more about the Wishart process model</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
